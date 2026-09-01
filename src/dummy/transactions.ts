@@ -1,5 +1,15 @@
 import { Transaction } from "@/types/transactions";
 
+export const transactionTypes: Transaction["type"][] = ["income", "expense"];
+export const transactionCategories: Transaction["category"][] = [
+  "salary",
+  "food",
+  "transport",
+  "shopping",
+  "bills",
+  "entertainment",
+  "other",
+];
 export const dummyTransactions: Transaction[] = [
   {
     id: "1",
