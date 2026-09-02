@@ -1,6 +1,7 @@
 import { DashboardCard, Header, RecentTransactions } from "@/components";
 import { dummyTransactions } from "@/dummy/transactions";
 import { dummyUser } from "@/dummy/user";
+import Link from "next/link";
 
 export default function Dashboard() {
   return (
@@ -27,7 +28,17 @@ export default function Dashboard() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h3 className="text-lg font-semibold">Recent Transactions</h3>
+          <div className="flex flex-row  items-center gap-4">
+            <h3 className="text-lg font-semibold ">Recent Transactions</h3>
+
+            <Link
+              href="/transactions"
+              className="text-blue-500 hover:underline"
+            >
+              View All
+            </Link>
+          </div>
+
           <RecentTransactions transactions={dummyTransactions} />
         </div>
       </div>
