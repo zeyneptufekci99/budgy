@@ -1,4 +1,4 @@
-import { Card, DashboardCard, Header, RecentTransactions } from "@/components";
+import { DashboardCard, Header, RecentTransactions } from "@/components";
 import { dummyTransactions } from "@/dummy/transactions";
 import { dummyUser } from "@/dummy/user";
 
@@ -8,7 +8,7 @@ export default function Dashboard() {
       <Header title={`Welcome ${dummyUser.name} ${dummyUser.surname} !`} />
       <div className="flex flex-col gap-4 p-8 w-full">
         <DashboardCard
-          className="border-2 border-balance text-balance"
+          className="border-2 border-balance text-balance!"
           title="Balance"
           amount={dummyUser.balance}
         />
@@ -26,8 +26,8 @@ export default function Dashboard() {
           />
         </div>
 
-        <div>
-          <div>Recent Transactions</div>
+        <div className="flex flex-col gap-4">
+          <h3 className="text-lg font-semibold">Recent Transactions</h3>
           <RecentTransactions transactions={dummyTransactions} />
         </div>
       </div>

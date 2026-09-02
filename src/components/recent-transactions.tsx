@@ -11,18 +11,17 @@ export const RecentTransactions = ({
 }: RecentTransactionsProps) => {
   return (
     <Card className="flex flex-col gap-4 p-8 w-100">
-      <div>Recent Transactions</div>
       <div>
         {transactions.map((tx) => (
           <div
             key={tx.id}
             className={cn(
-              "flex justify-between flex-col gap-2",
+              "flex justify-between flex-row gap-1",
               tx.type === "income" ? "text-income" : "text-expense",
             )}
           >
             <span>{tx.type === "income" ? "+" : "-"}</span>
-            <span>{tx.description}</span>
+            <span className="flex-1 mx-4 text-start">{tx.description}</span>
             <span>{tx.amount.toFixed(2)}</span>
           </div>
         ))}
