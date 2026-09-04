@@ -1,0 +1,6 @@
+@Budgy.Api_HostAddress = http://localhost:5090
+
+GET {{Budgy.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
