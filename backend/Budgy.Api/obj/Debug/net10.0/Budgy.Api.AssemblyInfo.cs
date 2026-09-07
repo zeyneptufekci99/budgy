@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Budgy.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+902c781164ae1af7863c4e00baaaefcd122a1771")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9f0e0dbaf558efa7d4a25832307758a6ec25d5eb")]
 [assembly: System.Reflection.AssemblyProductAttribute("Budgy.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Budgy.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

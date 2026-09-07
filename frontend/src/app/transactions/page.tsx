@@ -1,5 +1,6 @@
 "use client";
 
+import { deleteTransaction, getTransactions } from "@/api/transactions";
 import {
   CreateTransactionModal,
   Dropdown,
@@ -7,10 +8,10 @@ import {
   TransactionList,
 } from "@/components";
 import { transactionCategories, transactionTypes } from "@/dummy/transactions";
-import { getTransactions } from "@/lib/api";
 
 import type { Transaction } from "@/types/transactions";
 import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -44,6 +45,15 @@ export default function Transactions() {
     }));
   }, []);
 
+  const deleteTransactionFromTable = async (id: string) => {
+    try {
+      await deleteTransaction(id);
+      toast.success("Transaction deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete transaction.");
+    }
+  };
+
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
       const matchesType = !selectedType || transaction.type === selectedType;
@@ -76,7 +86,10 @@ export default function Transactions() {
           />
         </div>
 
-        <TransactionList transactions={filteredTransactions} />
+        <TransactionList
+          onDeleteTransaction={deleteTransactionFromTable}
+          transactions={filteredTransactions}
+        />
       </div>
     </div>
   );

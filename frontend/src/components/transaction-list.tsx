@@ -8,14 +8,21 @@ import {
   TableRow,
 } from "./ui/table";
 import { useMemo } from "react";
+import { Trash2 } from "lucide-react";
+import { Button } from "./ui/button";
 
 export type TransactionListProps = {
   transactions: Transaction[];
+  onDeleteTransaction: (id: string) => void;
 };
 
-export const TransactionList = ({ transactions }: TransactionListProps) => {
+export const TransactionList = ({
+  transactions,
+  onDeleteTransaction,
+}: TransactionListProps) => {
   const transactionTableData = useMemo(() => {
     return transactions.map((transaction) => ({
+      id: transaction.id,
       date: transaction.date,
       description: transaction.description,
       category: transaction.category,
@@ -32,7 +39,8 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
           <TableHead>Description</TableHead>
           <TableHead>Category</TableHead>
           <TableHead>Type</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
+          <TableHead>Amount</TableHead>
+          <TableHead className="text-right"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -52,7 +60,16 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
               {transaction.type.charAt(0).toUpperCase() +
                 transaction.type.slice(1)}
             </TableCell>
-            <TableCell className="text-right">{transaction.amount}</TableCell>
+            <TableCell>{transaction.amount}</TableCell>
+            <TableCell className="text-right">
+              <Button
+                onClick={() => onDeleteTransaction(transaction.id)}
+                variant="ghost"
+                size="icon"
+              >
+                <Trash2 size={18} />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
