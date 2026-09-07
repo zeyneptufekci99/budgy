@@ -14,11 +14,15 @@ import { Button } from "./ui/button";
 export type TransactionListProps = {
   transactions: Transaction[];
   onDeleteTransaction: (id: string) => void;
+  loading?: boolean;
+  error?: boolean;
 };
 
 export const TransactionList = ({
   transactions,
   onDeleteTransaction,
+  loading,
+  error,
 }: TransactionListProps) => {
   const transactionTableData = useMemo(() => {
     return transactions.map((transaction) => ({
@@ -44,34 +48,56 @@ export const TransactionList = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transactionTableData.map((transaction, index) => (
-          <TableRow key={index}>
-            <TableCell className="font-medium">
-              {new Date(transaction.date).toLocaleDateString()}
-            </TableCell>
-            <TableCell>{transaction.description}</TableCell>
-            <TableCell>
-              {transaction.category.charAt(0).toUpperCase() +
-                transaction.category.slice(1)}
-            </TableCell>
-            <TableCell
-              className={`${transaction.type === "income" ? "text-income" : "text-expense"}`}
-            >
-              {transaction.type.charAt(0).toUpperCase() +
-                transaction.type.slice(1)}
-            </TableCell>
-            <TableCell>{transaction.amount}</TableCell>
-            <TableCell className="text-right">
-              <Button
-                onClick={() => onDeleteTransaction(transaction.id)}
-                variant="ghost"
-                size="icon"
-              >
-                <Trash2 size={18} />
-              </Button>
+        {loading ? (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center py-8">
+              Loading transactions...
             </TableCell>
           </TableRow>
-        ))}
+        ) : error ? (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center py-8">
+              Failed to load transactions.
+            </TableCell>
+          </TableRow>
+        ) : transactions.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={5} className="text-center py-8">
+              No transactions found.
+            </TableCell>
+          </TableRow>
+        ) : (
+          <>
+            {transactionTableData.map((transaction, index) => (
+              <TableRow key={index}>
+                <TableCell className="font-medium">
+                  {new Date(transaction.date).toLocaleDateString()}
+                </TableCell>
+                <TableCell>{transaction.description}</TableCell>
+                <TableCell>
+                  {transaction.category.charAt(0).toUpperCase() +
+                    transaction.category.slice(1)}
+                </TableCell>
+                <TableCell
+                  className={`${transaction.type === "income" ? "text-income" : "text-expense"}`}
+                >
+                  {transaction.type.charAt(0).toUpperCase() +
+                    transaction.type.slice(1)}
+                </TableCell>
+                <TableCell>{transaction.amount}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    onClick={() => onDeleteTransaction(transaction.id)}
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </>
+        )}
       </TableBody>
     </Table>
   );

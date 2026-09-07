@@ -21,14 +21,19 @@ import { Input } from "./ui/input";
 import { createTransaction } from "@/api/transactions";
 import { toast } from "sonner";
 
-export type CreateTransactionModalProps = {};
+export type CreateTransactionModalProps = {
+  onSuccess?: () => void;
+};
 
-export const CreateTransactionModal = ({}: CreateTransactionModalProps) => {
+export const CreateTransactionModal = ({
+  onSuccess,
+}: CreateTransactionModalProps) => {
   const [type, setType] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,13 +54,15 @@ export const CreateTransactionModal = ({}: CreateTransactionModalProps) => {
       setCategory("");
       setDescription("");
       setDate("");
+      setOpen(false);
+      onSuccess?.();
     } catch (error) {
       toast.error("Failed to create transaction.");
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button size="lg" variant="outline">
@@ -65,7 +72,7 @@ export const CreateTransactionModal = ({}: CreateTransactionModalProps) => {
       />
 
       <DialogContent className="sm:max-w-sm">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader>
             <DialogTitle>Create Transaction</DialogTitle>
             <DialogDescription>

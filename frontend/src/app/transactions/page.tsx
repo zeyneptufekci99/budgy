@@ -10,24 +10,33 @@ import {
 import { transactionCategories, transactionTypes } from "@/dummy/transactions";
 
 import type { Transaction } from "@/types/transactions";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  const fetchTransactions = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(false);
+
+      const data = await getTransactions();
+      setTransactions(data);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+      setError(true);
+      toast.error("Failed to load transactions.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    async function fetchTransactions() {
-      try {
-        const data = await getTransactions();
-        setTransactions(data);
-      } catch (error) {
-        console.error("Failed to fetch transactions:", error);
-      }
-    }
-
     fetchTransactions();
   }, []);
 
@@ -49,6 +58,9 @@ export default function Transactions() {
     try {
       await deleteTransaction(id);
       toast.success("Transaction deleted successfully!");
+      setTransactions((prev) =>
+        prev.filter((transaction) => transaction.id !== id),
+      );
     } catch (error) {
       toast.error("Failed to delete transaction.");
     }
@@ -70,7 +82,7 @@ export default function Transactions() {
       <Header title="Transactions" />
 
       <div className="flex flex-col gap-4 p-8 w-full">
-        <CreateTransactionModal />
+        <CreateTransactionModal onSuccess={fetchTransactions} />
 
         <div className="flex flex-row gap-4">
           <Dropdown
@@ -87,6 +99,8 @@ export default function Transactions() {
         </div>
 
         <TransactionList
+          loading={loading}
+          error={error}
           onDeleteTransaction={deleteTransactionFromTable}
           transactions={filteredTransactions}
         />
