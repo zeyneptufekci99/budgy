@@ -38,7 +38,9 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
       <TableBody>
         {transactionTableData.map((transaction, index) => (
           <TableRow key={index}>
-            <TableCell className="font-medium">{transaction.date}</TableCell>
+            <TableCell className="font-medium">
+              {new Date(transaction.date).toLocaleDateString()}
+            </TableCell>
             <TableCell>{transaction.description}</TableCell>
             <TableCell>
               {transaction.category.charAt(0).toUpperCase() +
