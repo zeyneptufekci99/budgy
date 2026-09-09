@@ -1,4 +1,5 @@
-import { Transaction } from "@/types/transactions";
+import type { Transaction } from "@/types/transactions";
+import { Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -7,8 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { useMemo } from "react";
-import { Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 
 export type TransactionListProps = {
@@ -24,17 +23,6 @@ export const TransactionList = ({
   loading,
   error,
 }: TransactionListProps) => {
-  const transactionTableData = useMemo(() => {
-    return transactions.map((transaction) => ({
-      id: transaction.id,
-      date: transaction.date,
-      description: transaction.description,
-      category: transaction.category,
-      type: transaction.type,
-      amount: transaction.amount,
-    }));
-  }, [transactions]);
-
   return (
     <Table className="w-full">
       <TableHeader className="bg-chart-1">
@@ -47,56 +35,62 @@ export const TransactionList = ({
           <TableHead className="text-right"></TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
         {loading ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-8">
+            <TableCell colSpan={6} className="text-center py-8">
               Loading transactions...
             </TableCell>
           </TableRow>
         ) : error ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-8">
+            <TableCell colSpan={6} className="text-center py-8">
               Failed to load transactions.
             </TableCell>
           </TableRow>
         ) : transactions.length === 0 ? (
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-8">
+            <TableCell colSpan={6} className="text-center py-8">
               No transactions found.
             </TableCell>
           </TableRow>
         ) : (
-          <>
-            {transactionTableData.map((transaction, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">
-                  {new Date(transaction.date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{transaction.description}</TableCell>
-                <TableCell>
-                  {transaction.category.charAt(0).toUpperCase() +
-                    transaction.category.slice(1)}
-                </TableCell>
-                <TableCell
-                  className={`${transaction.type === "income" ? "text-income" : "text-expense"}`}
+          transactions.map((transaction) => (
+            <TableRow key={transaction.id}>
+              <TableCell className="font-medium">
+                {new Date(transaction.date).toLocaleDateString()}
+              </TableCell>
+
+              <TableCell>{transaction.description}</TableCell>
+
+              <TableCell>
+                {transaction.category.charAt(0).toUpperCase() +
+                  transaction.category.slice(1)}
+              </TableCell>
+
+              <TableCell
+                className={
+                  transaction.type === "income" ? "text-income" : "text-expense"
+                }
+              >
+                {transaction.type.charAt(0).toUpperCase() +
+                  transaction.type.slice(1)}
+              </TableCell>
+
+              <TableCell>{transaction.amount}</TableCell>
+
+              <TableCell className="text-right">
+                <Button
+                  onClick={() => onDeleteTransaction(transaction.id)}
+                  variant="ghost"
+                  size="icon"
                 >
-                  {transaction.type.charAt(0).toUpperCase() +
-                    transaction.type.slice(1)}
-                </TableCell>
-                <TableCell>{transaction.amount}</TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    onClick={() => onDeleteTransaction(transaction.id)}
-                    variant="ghost"
-                    size="icon"
-                  >
-                    <Trash2 size={18} />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </>
+                  <Trash2 size={18} />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))
         )}
       </TableBody>
     </Table>

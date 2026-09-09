@@ -41,30 +41,29 @@ export default function Transactions() {
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
 
-  const allTransactionTypes = useMemo(() => {
-    return transactionTypes.map((type) => ({
-      label: type.charAt(0).toUpperCase() + type.slice(1),
-      value: type,
-    }));
-  }, []);
+  const allTransactionTypes = transactionTypes.map((type) => ({
+    label: type.charAt(0).toUpperCase() + type.slice(1),
+    value: type,
+  }));
 
-  const allTransactionCategories = useMemo(() => {
-    return transactionCategories.map((category) => ({
-      label: category.charAt(0).toUpperCase() + category.slice(1),
-      value: category,
-    }));
-  }, []);
+  const allTransactionCategories = transactionCategories.map((category) => ({
+    label: category.charAt(0).toUpperCase() + category.slice(1),
+    value: category,
+  }));
 
   const deleteTransactionFromTable = async (id: string) => {
     try {
       await deleteTransaction(id);
-      toast.success("Transaction deleted successfully!");
+
       setTransactions((prev) =>
         prev.filter((transaction) => transaction.id !== id),
       );
+
+      toast.success("Transaction deleted successfully!");
     } catch (error) {
+      console.error("Failed to delete transaction:", error);
       toast.error("Failed to delete transaction.");
     }
   };

@@ -2,7 +2,6 @@
 
 import { getTransactions } from "@/api/transactions";
 import { DashboardCard, Header, RecentTransactions } from "@/components";
-
 import type { Transaction } from "@/types/transactions";
 import {
   calculateBalance,
@@ -10,9 +9,8 @@ import {
   calculateIncome,
   getRecentTransactions,
 } from "@/utils/transaction";
-
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export default function Dashboard() {
@@ -35,16 +33,10 @@ export default function Dashboard() {
     fetchTransactions();
   }, []);
 
-  const income = useMemo(() => calculateIncome(transactions), [transactions]);
-  const expenses = useMemo(
-    () => calculateExpenses(transactions),
-    [transactions],
-  );
-  const balance = useMemo(() => calculateBalance(transactions), [transactions]);
-  const recentTransactions = useMemo(
-    () => getRecentTransactions(transactions),
-    [transactions],
-  );
+  const income = calculateIncome(transactions);
+  const expenses = calculateExpenses(transactions);
+  const balance = calculateBalance(transactions);
+  const recentTransactions = getRecentTransactions(transactions);
 
   return (
     <div className="flex flex-col flex-1">
@@ -83,11 +75,11 @@ export default function Dashboard() {
             </Link>
           </div>
 
-          {loading ? (
-            <p>Loading transactions...</p>
-          ) : (
-            <RecentTransactions transactions={recentTransactions} />
-          )}
+          <RecentTransactions
+            isLoading={loading}
+            transactions={recentTransactions}
+            isEmpty={recentTransactions.length === 0}
+          />
         </div>
       </div>
     </div>
