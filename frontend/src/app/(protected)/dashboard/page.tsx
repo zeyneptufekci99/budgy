@@ -2,7 +2,7 @@
 
 import { getTransactions } from "@/api/transactions";
 import { DashboardCard, Header, RecentTransactions } from "@/components";
-import { dummyUser } from "@/dummy/user";
+
 import type { Transaction } from "@/types/transactions";
 import {
   calculateBalance,
@@ -48,7 +48,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col flex-1">
-      <Header title={`Welcome ${dummyUser.name} ${dummyUser.surname} !`} />
+      <Header title="Welcome" />
 
       <div className="flex flex-col gap-4 p-8 w-full">
         <DashboardCard

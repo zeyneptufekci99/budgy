@@ -15,11 +15,14 @@ import {
 
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Label } from "./ui/label";
-import { transactionCategories, transactionTypes } from "@/dummy/transactions";
 import { Dropdown } from "./dropdown";
 import { Input } from "./ui/input";
 import { createTransaction } from "@/api/transactions";
 import { toast } from "sonner";
+import {
+  transactionCategories,
+  transactionTypes,
+} from "@/contants/transactions";
 
 export type CreateTransactionModalProps = {
   onSuccess?: () => void;

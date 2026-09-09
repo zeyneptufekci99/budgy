@@ -8,8 +8,20 @@ export type CreateTransactionData = {
   date: string;
 };
 
+function getAuthHeaders() {
+  const token = localStorage.getItem("token");
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
 export async function getTransactions() {
-  const response = await fetch(`${API_URL}/api/transaction`);
+  const response = await fetch(`${API_URL}/api/transaction`, {
+    headers: {
+      ...getAuthHeaders(),
+    },
+  });
 
   if (!response.ok) {
     throw new Error("Failed to fetch transactions");
@@ -23,6 +35,7 @@ export async function createTransaction(data: CreateTransactionData) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...getAuthHeaders(),
     },
     body: JSON.stringify(data),
   });
@@ -37,6 +50,9 @@ export async function createTransaction(data: CreateTransactionData) {
 export async function deleteTransaction(id: string) {
   const response = await fetch(`${API_URL}/api/transaction/${id}`, {
     method: "DELETE",
+    headers: {
+      ...getAuthHeaders(),
+    },
   });
 
   if (!response.ok) {

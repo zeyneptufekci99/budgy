@@ -7,7 +7,10 @@ import {
   Header,
   TransactionList,
 } from "@/components";
-import { transactionCategories, transactionTypes } from "@/dummy/transactions";
+import {
+  transactionCategories,
+  transactionTypes,
+} from "@/contants/transactions";
 
 import type { Transaction } from "@/types/transactions";
 import { useCallback, useEffect, useMemo, useState } from "react";

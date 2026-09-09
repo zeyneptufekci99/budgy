@@ -4,11 +4,14 @@ using Budgy.Api.DTOs;
 using Budgy.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Budgy.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TransactionController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -22,7 +25,12 @@ public class TransactionController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<TransactionDto>>> GetTransactions()
     {
+        var userId = Guid.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
         var transactions = await _context.Transactions
+            .Where(t => t.UserId == userId)
             .OrderByDescending(t => t.Date)
             .Select(t => new TransactionDto
             {
@@ -43,9 +51,13 @@ public class TransactionController : ControllerBase
     public async Task<ActionResult<TransactionDto>> CreateTransaction(
         CreateTransactionDto dto)
     {
+        var userId = Guid.Parse(
+    User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         var transaction = new Transaction
         {
             Id = Guid.NewGuid(),
+            UserId = userId,
             Amount = dto.Amount,
             Type = dto.Type,
             Category = dto.Category,
@@ -77,7 +89,14 @@ public class TransactionController : ControllerBase
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteTransaction(Guid id)
     {
-        var transaction = await _context.Transactions.FindAsync(id);
+        var userId = Guid.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var transaction = await _context.Transactions
+            .FirstOrDefaultAsync(t =>
+                t.Id == id && t.UserId == userId
+            );
 
         if (transaction is null)
         {
