@@ -2,6 +2,7 @@
 
 import { deleteTransaction, getTransactions } from "@/api/transactions";
 import {
+  Button,
   CreateTransactionModal,
   Dropdown,
   Header,
@@ -24,6 +25,8 @@ export default function Transactions() {
   const [error, setError] = useState(false);
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   const fetchTransactions = useCallback(async () => {
     try {
@@ -72,14 +75,22 @@ export default function Transactions() {
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
+      const transactionDate = transaction.date.split("T")[0];
+
       const matchesType = !selectedType || transaction.type === selectedType;
 
       const matchesCategory =
         !selectedCategory || transaction.category === selectedCategory;
 
-      return matchesType && matchesCategory;
+      const matchesStartDate = !startDate || transactionDate >= startDate;
+
+      const matchesEndDate = !endDate || transactionDate <= endDate;
+
+      return (
+        matchesType && matchesCategory && matchesStartDate && matchesEndDate
+      );
     });
-  }, [transactions, selectedType, selectedCategory]);
+  }, [transactions, selectedType, selectedCategory, startDate, endDate]);
 
   const handleEditTransaction = (id: string) => {
     const transaction = transactions.find(
@@ -106,18 +117,68 @@ export default function Transactions() {
             fetchTransactions();
           }}
         />
-        <div className="flex flex-row gap-4">
-          <Dropdown
-            onChange={(value) => setSelectedType(value?.value || null)}
-            items={allTransactionTypes}
-            placeholder="Select Type"
-          />
+        <div className="flex flex-wrap items-end gap-4 rounded-lg border p-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium">Type</label>
 
-          <Dropdown
-            onChange={(value) => setSelectedCategory(value?.value || null)}
-            items={allTransactionCategories}
-            placeholder="Select Category"
-          />
+            <Dropdown
+              onChange={(value) => setSelectedType(value?.value || null)}
+              items={allTransactionTypes}
+              placeholder="Select Type"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium">Category</label>
+
+            <Dropdown
+              onChange={(value) => setSelectedCategory(value?.value || null)}
+              items={allTransactionCategories}
+              placeholder="Select Category"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="start-date" className="text-sm font-medium">
+              From
+            </label>
+
+            <input
+              id="start-date"
+              type="date"
+              value={startDate}
+              max={endDate || undefined}
+              onChange={(event) => setStartDate(event.target.value)}
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="end-date" className="text-sm font-medium">
+              To
+            </label>
+
+            <input
+              id="end-date"
+              type="date"
+              value={endDate}
+              min={startDate || undefined}
+              onChange={(event) => setEndDate(event.target.value)}
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            />
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSelectedType(null);
+              setSelectedCategory(null);
+              setStartDate("");
+              setEndDate("");
+            }}
+          >
+            Clear Filters
+          </Button>
         </div>
 
         <TransactionList
