@@ -1,13 +1,21 @@
 "use client";
 
 import { getTransactions } from "@/api/transactions";
-import { DashboardCard, Header, RecentTransactions } from "@/components";
+import {
+  DashboardCard,
+  Header,
+  RecentTransactions,
+  MonthlyChart,
+  ExpenseCategoryChart,
+} from "@/components";
 import type { Transaction } from "@/types/transactions";
 import {
   calculateBalance,
   calculateExpenses,
   calculateIncome,
   getRecentTransactions,
+  getMonthlyTransactionData,
+  getExpenseCategoryData,
 } from "@/utils/transaction";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -37,6 +45,8 @@ export default function Dashboard() {
   const expenses = calculateExpenses(transactions);
   const balance = calculateBalance(transactions);
   const recentTransactions = getRecentTransactions(transactions);
+  const monthlyTransactionData = getMonthlyTransactionData(transactions);
+  const expenseCategoryData = getExpenseCategoryData(transactions);
 
   return (
     <div className="flex flex-col flex-1">
@@ -74,7 +84,8 @@ export default function Dashboard() {
               View All
             </Link>
           </div>
-
+          <MonthlyChart data={monthlyTransactionData} />
+          <ExpenseCategoryChart data={expenseCategoryData} />
           <RecentTransactions
             isLoading={loading}
             transactions={recentTransactions}

@@ -7,3 +7,5 @@ export { Header } from "./header";
 export { TransactionList } from "./transaction-list";
 export { Dropdown } from "./dropdown";
 export { CreateTransactionModal } from "./create-transaction-modal";
+export { MonthlyChart } from "./monthly-chart";
+export { ExpenseCategoryChart } from "./expense-category-chart";
