@@ -1,6 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { updateTransaction, createTransaction } from "@/api/transactions";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+
+import type { Transaction } from "@/types/transactions";
+
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -12,24 +17,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "./ui/dialog";
-
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Label } from "./ui/label";
 import { Dropdown } from "./dropdown";
 import { Input } from "./ui/input";
-import { createTransaction } from "@/api/transactions";
-import { toast } from "sonner";
 import {
   transactionCategories,
   transactionTypes,
-} from "@/contants/transactions";
+} from "@/constants/transactions";
 
 export type CreateTransactionModalProps = {
+  transaction?: Transaction;
   onSuccess?: () => void;
+  onClose?: () => void;
 };
 
 export const CreateTransactionModal = ({
+  transaction,
   onSuccess,
+  onClose,
 }: CreateTransactionModalProps) => {
   const [type, setType] = useState("");
   const [amount, setAmount] = useState("");
@@ -38,57 +44,118 @@ export const CreateTransactionModal = ({
   const [date, setDate] = useState("");
   const [open, setOpen] = useState(false);
 
+  const isEditMode = !!transaction;
+
+  const transactionCategoryDropdownItems = transactionCategories.map(
+    (transactionCategory) => ({
+      label:
+        transactionCategory.charAt(0).toUpperCase() +
+        transactionCategory.slice(1),
+      value: transactionCategory,
+    }),
+  );
+
+  useEffect(() => {
+    if (!transaction) {
+      return;
+    }
+
+    setType(transaction.type);
+    setAmount(String(transaction.amount));
+    setCategory(transaction.category);
+    setDescription(transaction.description);
+    setDate(transaction.date.split("T")[0]);
+    setOpen(true);
+  }, [transaction]);
+
+  const resetForm = () => {
+    setType("");
+    setAmount("");
+    setCategory("");
+    setDescription("");
+    setDate("");
+  };
+
+  const handleOpenChange = (value: boolean) => {
+    setOpen(value);
+
+    if (!value && isEditMode) {
+      resetForm();
+      onClose?.();
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log({ type, amount, category, description, date });
+
     try {
-      await createTransaction({
+      const data = {
         amount: Number(amount),
         type,
         category,
         description,
         date,
-      });
+      };
 
-      toast.success("Transaction created successfully!");
+      if (isEditMode) {
+        await updateTransaction(transaction.id, data);
+        toast.success("Transaction updated successfully!");
+      } else {
+        await createTransaction(data);
+        toast.success("Transaction created successfully!");
+      }
 
-      setType("");
-      setAmount("");
-      setCategory("");
-      setDescription("");
-      setDate("");
+      resetForm();
       setOpen(false);
       onSuccess?.();
     } catch (error) {
-      toast.error("Failed to create transaction.");
+      console.error("Failed to save transaction:", error);
+
+      toast.error(
+        isEditMode
+          ? "Failed to update transaction."
+          : "Failed to create transaction.",
+      );
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          <Button size="lg" variant="outline">
-            Add Transaction
-          </Button>
-        }
-      />
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      {!isEditMode && (
+        <DialogTrigger
+          render={
+            <Button size="lg" variant="outline">
+              Add Transaction
+            </Button>
+          }
+        />
+      )}
 
       <DialogContent className="sm:max-w-sm">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader>
-            <DialogTitle>Create Transaction</DialogTitle>
+            <DialogTitle>
+              {isEditMode ? "Edit Transaction" : "Create Transaction"}
+            </DialogTitle>
+
             <DialogDescription>
-              Fill in the details below to create a new transaction.
+              {isEditMode
+                ? "Update the transaction details below."
+                : "Fill in the details below to create a new transaction."}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-2">
             <Label>Type</Label>
-            <ToggleGroup onValueChange={(value) => setType(value[0])}>
-              {transactionTypes.map((type) => (
-                <ToggleGroupItem key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
+
+            <ToggleGroup
+              value={type ? [type] : []}
+              onValueChange={(value) => setType(value[0] || "")}
+            >
+              {transactionTypes.map((transactionType) => (
+                <ToggleGroupItem key={transactionType} value={transactionType}>
+                  {transactionType.charAt(0).toUpperCase() +
+                    transactionType.slice(1)}
                 </ToggleGroupItem>
               ))}
             </ToggleGroup>
@@ -109,12 +176,12 @@ export const CreateTransactionModal = ({
             <Label>Category</Label>
 
             <Dropdown
-              items={transactionCategories.map((transactionCategory) => ({
-                label:
-                  transactionCategory.charAt(0).toUpperCase() +
-                  transactionCategory.slice(1),
-                value: transactionCategory,
-              }))}
+              items={transactionCategoryDropdownItems}
+              defaultValue={
+                transactionCategoryDropdownItems.find(
+                  (item) => item.value === category,
+                ) || undefined
+              }
               onChange={(value) => setCategory(value?.value || "")}
               placeholder="Select Category"
             />
@@ -143,7 +210,9 @@ export const CreateTransactionModal = ({
           <DialogFooter>
             <DialogClose render={<Button variant="outline">Cancel</Button>} />
 
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">
+              {isEditMode ? "Update Transaction" : "Create Transaction"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -47,6 +47,26 @@ export async function createTransaction(data: CreateTransactionData) {
   return response.json();
 }
 
+export async function updateTransaction(
+  id: string,
+  data: CreateTransactionData,
+) {
+  const response = await fetch(`${API_URL}/api/transaction/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update transaction");
+  }
+
+  return response.json();
+}
+
 export async function deleteTransaction(id: string) {
   const response = await fetch(`${API_URL}/api/transaction/${id}`, {
     method: "DELETE",

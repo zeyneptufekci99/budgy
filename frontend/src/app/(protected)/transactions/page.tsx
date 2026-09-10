@@ -10,7 +10,7 @@ import {
 import {
   transactionCategories,
   transactionTypes,
-} from "@/contants/transactions";
+} from "@/constants/transactions";
 
 import type { Transaction } from "@/types/transactions";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -22,6 +22,8 @@ export default function Transactions() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
 
   const fetchTransactions = useCallback(async () => {
     try {
@@ -79,13 +81,31 @@ export default function Transactions() {
     });
   }, [transactions, selectedType, selectedCategory]);
 
+  const handleEditTransaction = (id: string) => {
+    const transaction = transactions.find(
+      (transaction) => transaction.id === id,
+    );
+
+    if (!transaction) {
+      return;
+    }
+
+    setEditingTransaction(transaction);
+  };
+
   return (
     <div className="flex flex-col flex-1">
       <Header title="Transactions" />
 
       <div className="flex flex-col gap-4 p-8 w-full">
-        <CreateTransactionModal onSuccess={fetchTransactions} />
-
+        <CreateTransactionModal
+          transaction={editingTransaction ?? undefined}
+          onClose={() => setEditingTransaction(null)}
+          onSuccess={() => {
+            setEditingTransaction(null);
+            fetchTransactions();
+          }}
+        />
         <div className="flex flex-row gap-4">
           <Dropdown
             onChange={(value) => setSelectedType(value?.value || null)}
@@ -101,6 +121,7 @@ export default function Transactions() {
         </div>
 
         <TransactionList
+          onEditTransaction={handleEditTransaction}
           loading={loading}
           error={error}
           onDeleteTransaction={deleteTransactionFromTable}

@@ -13,14 +13,21 @@ export type DropdownItemProps = {
 };
 
 export type DropdownProps = {
+  defaultValue?: DropdownItemProps;
   items: DropdownItemProps[];
   placeholder?: string;
   onChange?: (value: DropdownItemProps | null) => void;
 };
 
-export const Dropdown = ({ items, placeholder, onChange }: DropdownProps) => {
+export const Dropdown = ({
+  defaultValue,
+  items,
+  placeholder,
+  onChange,
+}: DropdownProps) => {
   return (
     <Combobox
+      defaultValue={defaultValue ?? null}
       items={items}
       itemToStringValue={(item: DropdownItemProps) => item.label}
       onValueChange={(value) => onChange && onChange(value)}

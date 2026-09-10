@@ -85,6 +85,49 @@ public class TransactionController : ControllerBase
         );
     }
 
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<TransactionDto>> UpdateTransaction(
+    Guid id,
+    CreateTransactionDto dto)
+    {
+        var userId = Guid.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!
+        );
+
+        var transaction = await _context.Transactions
+            .FirstOrDefaultAsync(t =>
+                t.Id == id && t.UserId == userId
+            );
+
+        if (transaction is null)
+        {
+            return NotFound();
+        }
+
+        transaction.Amount = dto.Amount;
+        transaction.Type = dto.Type;
+        transaction.Category = dto.Category;
+        transaction.Description = dto.Description;
+        transaction.Date = DateTime.SpecifyKind(
+            dto.Date,
+            DateTimeKind.Utc
+        );
+
+        await _context.SaveChangesAsync();
+
+        var result = new TransactionDto
+        {
+            Id = transaction.Id,
+            Amount = transaction.Amount,
+            Type = transaction.Type,
+            Category = transaction.Category,
+            Description = transaction.Description,
+            Date = transaction.Date
+        };
+
+        return Ok(result);
+    }
+
     // DELETE: api/transaction/{id}
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteTransaction(Guid id)

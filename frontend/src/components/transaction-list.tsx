@@ -1,5 +1,5 @@
 import type { Transaction } from "@/types/transactions";
-import { Trash2 } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,12 +9,14 @@ import {
   TableRow,
 } from "./ui/table";
 import { Button } from "./ui/button";
+import { CustomContextMenu } from "./custom-context-menu";
 
 export type TransactionListProps = {
   transactions: Transaction[];
   onDeleteTransaction: (id: string) => void;
   loading?: boolean;
   error?: boolean;
+  onEditTransaction: (id: string) => void;
 };
 
 export const TransactionList = ({
@@ -22,7 +24,25 @@ export const TransactionList = ({
   onDeleteTransaction,
   loading,
   error,
+  onEditTransaction,
 }: TransactionListProps) => {
+  const contextMenuItems = (transactionId: string) => {
+    return [
+      {
+        label: "Edit",
+        onClick: () => {
+          onEditTransaction(transactionId);
+        },
+      },
+      {
+        label: "Delete",
+        onClick: () => {
+          onDeleteTransaction(transactionId);
+        },
+      },
+    ];
+  };
+
   return (
     <Table className="w-full">
       <TableHeader className="bg-chart-1">
@@ -81,13 +101,10 @@ export const TransactionList = ({
               <TableCell>{transaction.amount}</TableCell>
 
               <TableCell className="text-right">
-                <Button
-                  onClick={() => onDeleteTransaction(transaction.id)}
-                  variant="ghost"
-                  size="icon"
-                >
-                  <Trash2 size={18} />
-                </Button>
+                <CustomContextMenu
+                  trigger={<EllipsisVertical size={18} />}
+                  items={contextMenuItems(transaction.id)}
+                />
               </TableCell>
             </TableRow>
           ))
